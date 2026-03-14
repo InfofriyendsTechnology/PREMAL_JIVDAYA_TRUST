@@ -1,10 +1,17 @@
 {
     "buildCommand": "npm install",
-    "outputDirectory": ".",
-    "routes": [
+    "rewrites": [
         {
-            "src": "/api/(.*)",
-            "dest": "src/server.js"
+            "source": "/api/(.*)",
+            "destination": "/api"
+        },
+        {
+            "source": "/health",
+            "destination": "/api"
+        },
+        {
+            "source": "/(.*)",
+            "destination": "/api"
         }
     ]
 }
