@@ -329,12 +329,11 @@ export default function PosterMaker() {
     offsetRef.current = { ...adjOffset };
     zoomRef.current = adjZoom;
     setSliderVal(adjZoom);
-    setShowPasswordModal(true); // Show password modal first
-    setPasswordInput('');
+    setShowAdjust(true);
   };
 
   const handlePasswordSubmit = () => {
-    if (passwordInput === 'Yash') {
+    if (passwordInput === 'Yash@5353') {
       setShowPasswordModal(false);
       setPasswordInput('');
       setCurrentTab('adjust'); // Switch to adjust tab
@@ -347,7 +346,7 @@ export default function PosterMaker() {
   const applyAdjust = () => {
     setAdjOffset({ ...offsetRef.current });  // confirmed → triggers poster redraw
     setAdjZoom(zoomRef.current);
-    setCurrentTab('create'); // Back to create tab after applying
+    setShowAdjust(false);                     // Close adjust modal
   };
 
   // ── 6. Photo file selected — direct to poster, then open adjust ─
@@ -367,7 +366,7 @@ export default function PosterMaker() {
         setAdjZoom(1.0);
         setSliderVal(1.0);
         setPhotoSrc(src);                 // → triggers useEffect → redraws poster
-        setCurrentTab('adjust');          // → auto-switch to adjust tab
+        setShowAdjust(true);              // → open adjust modal
       };
       img.src = src;
     };
