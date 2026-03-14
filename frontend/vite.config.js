@@ -7,7 +7,7 @@ export default defineConfig({
     react(),
     VitePWA({
       registerType: 'autoUpdate',
-      includeAssets: ['logo-round.svg', 'logo.jpg', 'template.png'],
+      includeAssets: ['logo-round.svg', 'logo.jpg'],
       manifest: {
         name: 'Premal Jivdaya Trust Poster Maker',
         short_name: 'Poster Maker',
@@ -37,9 +37,10 @@ export default defineConfig({
         categories: ['productivity', 'utilities'],
       },
       workbox: {
-        globPatterns: ['**/*.{js,css,html,png,jpg,svg,gif}'],
+        globPatterns: ['**/*.{js,css,html,svg}'],
+        globIgnores: ['**/template.png'],
         cleanupOutdatedCaches: true,
-        maximumFileSizeToCacheInBytes: 5000000,
+        maximumFileSizeToCacheInBytes: 2000000,
         runtimeCaching: [
           {
             urlPattern: /^https:\/\/fonts\.(googleapis|gstatic)\.com\/.*/i,
