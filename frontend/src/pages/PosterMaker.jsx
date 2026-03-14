@@ -384,6 +384,10 @@ export default function PosterMaker() {
       showToast('⚠️ Please fill all fields before downloading');
       return;
     }
+    if (phone.trim().length !== 10 || !/^\d{10}$/.test(phone.trim())) {
+      showToast('⚠️ Phone number must be exactly 10 digits');
+      return;
+    }
     setDownloading(true);
     try {
       axios.post('/api/log', {
@@ -403,7 +407,8 @@ export default function PosterMaker() {
     }
   };
 
-  const canDownload = firstName.trim() && lastName.trim() && phone.trim() && tplReady && !downloading;
+  const isPhoneValid = phone.trim().length === 10 && /^\d{10}$/.test(phone.trim());
+  const canDownload = firstName.trim() && lastName.trim() && isPhoneValid && tplReady && !downloading;
 
   // ══════════════════════════════════════════════════════════════
   // RENDER
@@ -631,8 +636,12 @@ export default function PosterMaker() {
                 type="tel"
                 placeholder="e.g. 9876543210"
                 value={phone}
-                onChange={(e) => setPhone(e.target.value)}
-                maxLength={15}
+                onChange={(e) => {
+                  const value = e.target.value.replace(/\D/g, '');
+                  if (value.length <= 10) setPhone(value);
+                }}
+                maxLength="10"
+                style={{ borderColor: phone && !isPhoneValid ? '#ef4444' : '' }}
               />
             </div>
           </div>
