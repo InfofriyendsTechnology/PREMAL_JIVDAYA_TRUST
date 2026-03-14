@@ -408,7 +408,7 @@ export default function PosterMaker() {
   };
 
   const isPhoneValid = phone.trim().length === 10 && /^\d{10}$/.test(phone.trim());
-  const canDownload = firstName.trim() && lastName.trim() && isPhoneValid && tplReady && !downloading;
+  const canDownload = firstName.trim() && lastName.trim() && isPhoneValid && photoSrc && tplReady && !downloading;
 
   // ══════════════════════════════════════════════════════════════
   // RENDER
