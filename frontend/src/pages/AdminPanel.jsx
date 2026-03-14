@@ -1,5 +1,5 @@
 import { useState, useEffect, useRef, useCallback } from 'react';
-import axios from 'axios';
+import axios from '../axiosConfig.js';
 import { FiDownload, FiRefreshCw, FiLogOut, FiUsers, FiTrash2, FiLayout, FiSave } from 'react-icons/fi';
 import styles from './AdminPanel.module.css';
 
@@ -11,34 +11,34 @@ const DEFAULT_LAYOUT = {
 };
 
 export default function AdminPanel() {
-  const [password,    setPassword]    = useState('');
-  const [authed,      setAuthed]      = useState(false);
+  const [password, setPassword] = useState('');
+  const [authed, setAuthed] = useState(false);
   const [submissions, setSubmissions] = useState([]);
-  const [total,       setTotal]       = useState(0);
-  const [loading,     setLoading]     = useState(false);
-  const [error,       setError]       = useState('');
+  const [total, setTotal] = useState(0);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState('');
 
   // Layout settings tab
-  const [activeTab,     setActiveTab]     = useState('submissions');
-  const [layoutForm,    setLayoutForm]    = useState(DEFAULT_LAYOUT);
+  const [activeTab, setActiveTab] = useState('submissions');
+  const [layoutForm, setLayoutForm] = useState(DEFAULT_LAYOUT);
   const [layoutLoading, setLayoutLoading] = useState(false);
-  const [layoutMsg,     setLayoutMsg]     = useState(''); // '' | 'saved' | 'error'
+  const [layoutMsg, setLayoutMsg] = useState(''); // '' | 'saved' | 'error'
 
   // Live preview canvas
   const previewCanvasRef = useRef(null);
-  const tplRef           = useRef(null);
-  const [tplReady, setTplReady]         = useState(false);
-  const dragRef          = useRef({ active: false, type: null, startX: 0, startY: 0, startLayout: null });
-  const layoutFormRef    = useRef(DEFAULT_LAYOUT);        // always-current mirror (for drag handlers)
-  const [previewCursor,  setPreviewCursor] = useState('default');
+  const tplRef = useRef(null);
+  const [tplReady, setTplReady] = useState(false);
+  const dragRef = useRef({ active: false, type: null, startX: 0, startY: 0, startLayout: null });
+  const layoutFormRef = useRef(DEFAULT_LAYOUT);        // always-current mirror (for drag handlers)
+  const [previewCursor, setPreviewCursor] = useState('default');
 
   // Load template.png once for live preview
   useEffect(() => {
     const img = new Image();
     img.onload = () => {
       const SIZE = 480;
-      const off  = document.createElement('canvas');
-      off.width  = SIZE;
+      const off = document.createElement('canvas');
+      off.width = SIZE;
       off.height = Math.round(img.naturalHeight * (SIZE / img.naturalWidth));
       off.getContext('2d').drawImage(img, 0, 0, off.width, off.height);
       tplRef.current = off;
@@ -60,14 +60,14 @@ export default function AdminPanel() {
     try {
       const { data } = await axios.get('/api/admin/settings');
       setLayoutForm({
-        photoLeft:   String(data.photoLeft),
-        photoTop:    String(data.photoTop),
-        photoWidth:  String(data.photoWidth),
+        photoLeft: String(data.photoLeft),
+        photoTop: String(data.photoTop),
+        photoWidth: String(data.photoWidth),
         photoHeight: String(data.photoHeight),
-        nameCX:      String(data.nameCX),
-        nameCY:      String(data.nameCY),
+        nameCX: String(data.nameCX),
+        nameCY: String(data.nameCY),
         nameFontPct: String(data.nameFontPct),
-        maxName:     String(data.maxName),
+        maxName: String(data.maxName),
       });
     } catch {
       // keep defaults
@@ -80,24 +80,24 @@ export default function AdminPanel() {
   // ── Live preview draw ────────────────────────────────────────
   const drawPreview = useCallback((form) => {
     const canvas = previewCanvasRef.current;
-    const tpl    = tplRef.current;
+    const tpl = tplRef.current;
     if (!canvas || !tpl) return;
 
     const cw = tpl.width;
     const ch = tpl.height;
-    canvas.width  = cw;
+    canvas.width = cw;
     canvas.height = ch;
 
     const ctx = canvas.getContext('2d');
     ctx.clearRect(0, 0, cw, ch);
     ctx.drawImage(tpl, 0, 0, cw, ch);
 
-    const pl  = parseFloat(form.photoLeft)   || 0;
-    const pt  = parseFloat(form.photoTop)    || 0;
-    const pw  = parseFloat(form.photoWidth)  || 0;
-    const ph  = parseFloat(form.photoHeight) || 0;
-    const ncx = parseFloat(form.nameCX)      || 0;
-    const ncy = parseFloat(form.nameCY)      || 0;
+    const pl = parseFloat(form.photoLeft) || 0;
+    const pt = parseFloat(form.photoTop) || 0;
+    const pw = parseFloat(form.photoWidth) || 0;
+    const ph = parseFloat(form.photoHeight) || 0;
+    const ncx = parseFloat(form.nameCX) || 0;
+    const ncy = parseFloat(form.nameCY) || 0;
     const nfp = parseFloat(form.nameFontPct) || 0.025;
 
     const px = pl * cw, py = pt * ch, pW = pw * cw, pH = ph * ch;
@@ -106,58 +106,58 @@ export default function AdminPanel() {
     // Photo area — diamond tint + outline
     ctx.save();
     ctx.beginPath();
-    ctx.moveTo(px + pW/2, py);
-    ctx.lineTo(px + pW,   py + pH/2);
-    ctx.lineTo(px + pW/2, py + pH);
-    ctx.lineTo(px,        py + pH/2);
+    ctx.moveTo(px + pW / 2, py);
+    ctx.lineTo(px + pW, py + pH / 2);
+    ctx.lineTo(px + pW / 2, py + pH);
+    ctx.lineTo(px, py + pH / 2);
     ctx.closePath();
-    ctx.fillStyle   = 'rgba(0,229,255,0.14)';
+    ctx.fillStyle = 'rgba(0,229,255,0.14)';
     ctx.fill();
     ctx.strokeStyle = '#00e5ff';
-    ctx.lineWidth   = 2.5;
+    ctx.lineWidth = 2.5;
     ctx.stroke();
     ctx.restore();
 
     // Name — sample text
     const fontSize = Math.max(8, Math.round(nfp * cw));
     ctx.save();
-    ctx.font         = `700 ${fontSize}px sans-serif`;
-    ctx.fillStyle    = '#ffeb3b';
-    ctx.textAlign    = 'center';
+    ctx.font = `700 ${fontSize}px sans-serif`;
+    ctx.fillStyle = '#ffeb3b';
+    ctx.textAlign = 'center';
     ctx.textBaseline = 'middle';
-    ctx.shadowColor  = 'rgba(0,0,0,0.9)';
-    ctx.shadowBlur   = 10;
+    ctx.shadowColor = 'rgba(0,0,0,0.9)';
+    ctx.shadowBlur = 10;
     ctx.fillText('Sample Name', nx, ny, Math.round(0.38 * cw));
-    ctx.shadowBlur   = 0;
+    ctx.shadowBlur = 0;
     // crosshair
     ctx.strokeStyle = 'rgba(255,235,59,0.5)';
-    ctx.lineWidth   = 1.5;
-    ctx.setLineDash([4,4]);
-    ctx.beginPath(); ctx.moveTo(nx-30,ny); ctx.lineTo(nx+30,ny); ctx.stroke();
-    ctx.beginPath(); ctx.moveTo(nx,ny-20); ctx.lineTo(nx,ny+20); ctx.stroke();
+    ctx.lineWidth = 1.5;
+    ctx.setLineDash([4, 4]);
+    ctx.beginPath(); ctx.moveTo(nx - 30, ny); ctx.lineTo(nx + 30, ny); ctx.stroke();
+    ctx.beginPath(); ctx.moveTo(nx, ny - 20); ctx.lineTo(nx, ny + 20); ctx.stroke();
     ctx.setLineDash([]);
     ctx.restore();
 
     // ── Drag handles (drawn on top of everything) ──
     const HR = Math.max(7, Math.round(cw * 0.018));    // handle radius
-    const drawH = (hx, hy, stroke, fill='#fff') => {
+    const drawH = (hx, hy, stroke, fill = '#fff') => {
       ctx.save();
       ctx.beginPath();
-      ctx.arc(hx, hy, HR, 0, Math.PI*2);
-      ctx.fillStyle   = fill;
+      ctx.arc(hx, hy, HR, 0, Math.PI * 2);
+      ctx.fillStyle = fill;
       ctx.fill();
       ctx.strokeStyle = stroke;
-      ctx.lineWidth   = 2.5;
+      ctx.lineWidth = 2.5;
       ctx.stroke();
       ctx.restore();
     };
 
     // Photo: 4 vertex resize handles + centre move handle
-    drawH(px + pW/2, py,        '#00e5ff');                         // top
-    drawH(px + pW,   py + pH/2, '#00e5ff');                         // right
-    drawH(px + pW/2, py + pH,   '#00e5ff');                         // bottom
-    drawH(px,        py + pH/2, '#00e5ff');                         // left
-    drawH(px + pW/2, py + pH/2, '#00e5ff', 'rgba(0,229,255,0.35)'); // center
+    drawH(px + pW / 2, py, '#00e5ff');                         // top
+    drawH(px + pW, py + pH / 2, '#00e5ff');                         // right
+    drawH(px + pW / 2, py + pH, '#00e5ff');                         // bottom
+    drawH(px, py + pH / 2, '#00e5ff');                         // left
+    drawH(px + pW / 2, py + pH / 2, '#00e5ff', 'rgba(0,229,255,0.35)'); // center
 
     // Name: move handle
     drawH(nx, ny, '#ffeb3b');
@@ -173,10 +173,10 @@ export default function AdminPanel() {
   // ── Drag interaction helpers ──────────────────────────────
   const getCanvasPos = (e, canvas) => {
     const rect = canvas.getBoundingClientRect();
-    const p    = e.touches?.[0] ?? e;
+    const p = e.touches?.[0] ?? e;
     return {
-      x: (p.clientX - rect.left) * (canvas.width  / rect.width),
-      y: (p.clientY - rect.top)  * (canvas.height / rect.height),
+      x: (p.clientX - rect.left) * (canvas.width / rect.width),
+      y: (p.clientY - rect.top) * (canvas.height / rect.height),
     };
   };
 
@@ -184,25 +184,25 @@ export default function AdminPanel() {
   const hitTest = (cx, cy, form, cw, ch) => {
     const pl = parseFloat(form.photoLeft), pt = parseFloat(form.photoTop);
     const pw = parseFloat(form.photoWidth), ph = parseFloat(form.photoHeight);
-    const ncx = parseFloat(form.nameCX),   ncy = parseFloat(form.nameCY);
-    const px = pl*cw, py = pt*ch, pW = pw*cw, pH = ph*ch;
-    const nx = ncx*cw, ny = ncy*ch;
-    const d = (ax,ay,bx,by) => Math.hypot(ax-bx,ay-by);
-    if (d(cx,cy,nx,ny)           <= HHIT) return 'name-move';
-    if (d(cx,cy,px+pW/2,py)      <= HHIT) return 'photo-top';
-    if (d(cx,cy,px+pW,py+pH/2)   <= HHIT) return 'photo-right';
-    if (d(cx,cy,px+pW/2,py+pH)   <= HHIT) return 'photo-bottom';
-    if (d(cx,cy,px,py+pH/2)      <= HHIT) return 'photo-left';
-    if (d(cx,cy,px+pW/2,py+pH/2) <= HHIT) return 'photo-move';
+    const ncx = parseFloat(form.nameCX), ncy = parseFloat(form.nameCY);
+    const px = pl * cw, py = pt * ch, pW = pw * cw, pH = ph * ch;
+    const nx = ncx * cw, ny = ncy * ch;
+    const d = (ax, ay, bx, by) => Math.hypot(ax - bx, ay - by);
+    if (d(cx, cy, nx, ny) <= HHIT) return 'name-move';
+    if (d(cx, cy, px + pW / 2, py) <= HHIT) return 'photo-top';
+    if (d(cx, cy, px + pW, py + pH / 2) <= HHIT) return 'photo-right';
+    if (d(cx, cy, px + pW / 2, py + pH) <= HHIT) return 'photo-bottom';
+    if (d(cx, cy, px, py + pH / 2) <= HHIT) return 'photo-left';
+    if (d(cx, cy, px + pW / 2, py + pH / 2) <= HHIT) return 'photo-move';
     // diamond interior
-    if (Math.abs(cx-(px+pW/2))/(pW/2) + Math.abs(cy-(py+pH/2))/(pH/2) <= 1) return 'photo-move';
+    if (Math.abs(cx - (px + pW / 2)) / (pW / 2) + Math.abs(cy - (py + pH / 2)) / (pH / 2) <= 1) return 'photo-move';
     return null;
   };
 
   const DRAG_CURSORS = {
-    'photo-move':   'grab',      'photo-top':    'ns-resize',
-    'photo-bottom': 'ns-resize', 'photo-right':  'ew-resize',
-    'photo-left':   'ew-resize', 'name-move':    'grab',
+    'photo-move': 'grab', 'photo-top': 'ns-resize',
+    'photo-bottom': 'ns-resize', 'photo-right': 'ew-resize',
+    'photo-left': 'ew-resize', 'name-move': 'grab',
   };
 
   const onPreviewDown = (e) => {
@@ -231,26 +231,26 @@ export default function AdminPanel() {
 
     const { type, startX, startY, startLayout: sl } = dragRef.current;
     const dx = x - startX, dy = y - startY;
-    const cl = (v, lo=0, hi=1) => Math.min(hi, Math.max(lo, v));
+    const cl = (v, lo = 0, hi = 1) => Math.min(hi, Math.max(lo, v));
     const fmt = (v) => parseFloat(v.toFixed(4)).toString();
     const n = { ...sl };
 
     if (type === 'photo-move') {
-      n.photoLeft = fmt(cl(parseFloat(sl.photoLeft) + dx/cw));
-      n.photoTop  = fmt(cl(parseFloat(sl.photoTop)  + dy/ch));
+      n.photoLeft = fmt(cl(parseFloat(sl.photoLeft) + dx / cw));
+      n.photoTop = fmt(cl(parseFloat(sl.photoTop) + dy / ch));
     } else if (type === 'photo-top') {
-      n.photoTop    = fmt(cl(parseFloat(sl.photoTop)    + dy/ch));
-      n.photoHeight = fmt(cl(parseFloat(sl.photoHeight) - dy/ch, 0.01));
+      n.photoTop = fmt(cl(parseFloat(sl.photoTop) + dy / ch));
+      n.photoHeight = fmt(cl(parseFloat(sl.photoHeight) - dy / ch, 0.01));
     } else if (type === 'photo-bottom') {
-      n.photoHeight = fmt(cl(parseFloat(sl.photoHeight) + dy/ch, 0.01));
+      n.photoHeight = fmt(cl(parseFloat(sl.photoHeight) + dy / ch, 0.01));
     } else if (type === 'photo-right') {
-      n.photoWidth  = fmt(cl(parseFloat(sl.photoWidth)  + dx/cw, 0.01));
+      n.photoWidth = fmt(cl(parseFloat(sl.photoWidth) + dx / cw, 0.01));
     } else if (type === 'photo-left') {
-      n.photoLeft  = fmt(cl(parseFloat(sl.photoLeft)  + dx/cw));
-      n.photoWidth = fmt(cl(parseFloat(sl.photoWidth) - dx/cw, 0.01));
+      n.photoLeft = fmt(cl(parseFloat(sl.photoLeft) + dx / cw));
+      n.photoWidth = fmt(cl(parseFloat(sl.photoWidth) - dx / cw, 0.01));
     } else if (type === 'name-move') {
-      n.nameCX = fmt(cl(parseFloat(sl.nameCX) + dx/cw));
-      n.nameCY = fmt(cl(parseFloat(sl.nameCY) + dy/ch));
+      n.nameCX = fmt(cl(parseFloat(sl.nameCX) + dx / cw));
+      n.nameCY = fmt(cl(parseFloat(sl.nameCY) + dy / ch));
     }
 
     drawPreview(n);      // imperative — immediate
@@ -267,14 +267,14 @@ export default function AdminPanel() {
     setLayoutMsg('');
     try {
       await axios.put('/api/admin/settings', {
-        photoLeft:   parseFloat(layoutForm.photoLeft),
-        photoTop:    parseFloat(layoutForm.photoTop),
-        photoWidth:  parseFloat(layoutForm.photoWidth),
+        photoLeft: parseFloat(layoutForm.photoLeft),
+        photoTop: parseFloat(layoutForm.photoTop),
+        photoWidth: parseFloat(layoutForm.photoWidth),
         photoHeight: parseFloat(layoutForm.photoHeight),
-        nameCX:      parseFloat(layoutForm.nameCX),
-        nameCY:      parseFloat(layoutForm.nameCY),
+        nameCX: parseFloat(layoutForm.nameCX),
+        nameCY: parseFloat(layoutForm.nameCY),
         nameFontPct: parseFloat(layoutForm.nameFontPct),
-        maxName:     parseInt(layoutForm.maxName, 10),
+        maxName: parseInt(layoutForm.maxName, 10),
       }, {
         headers: { 'x-admin-password': sessionStorage.getItem(ADMIN_PASSWORD_KEY) },
       });
@@ -324,8 +324,10 @@ export default function AdminPanel() {
       setTotal(data.total);
       fetchLayout();
     } catch (e) {
+      console.error('Login error:', e.message, e.response);
       if (e.response?.status === 401) setError('Incorrect password');
-      else setError('Server error, try again');
+      else if (e.code === 'ERR_NETWORK') setError('Cannot connect to backend. Is the server running on localhost:5001?');
+      else setError(`Server error: ${e.message}`);
     } finally {
       setLoading(false);
     }
@@ -405,18 +407,22 @@ export default function AdminPanel() {
 
   // ── Layout Settings tab helpers ──────────────────────────────
   const layoutFields = [
-    { section: 'Photo Frame', fields: [
-      { key: 'photoLeft',   label: 'Left (0–1)',   hint: 'X start of photo area' },
-      { key: 'photoTop',    label: 'Top (0–1)',    hint: 'Y start of photo area' },
-      { key: 'photoWidth',  label: 'Width (0–1)',  hint: 'Width of photo area' },
-      { key: 'photoHeight', label: 'Height (0–1)', hint: 'Height of photo area' },
-    ]},
-    { section: 'Name Text', fields: [
-      { key: 'nameCX',      label: 'Center X (0–1)',   hint: 'Horizontal center of name' },
-      { key: 'nameCY',      label: 'Center Y (0–1)',   hint: 'Vertical center of name' },
-      { key: 'nameFontPct', label: 'Font size (0–1)', hint: 'Font size as fraction of width' },
-      { key: 'maxName',     label: 'Max chars',        hint: 'Max combined firstName+lastName length', integer: true },
-    ]},
+    {
+      section: 'Photo Frame', fields: [
+        { key: 'photoLeft', label: 'Left (0–1)', hint: 'X start of photo area' },
+        { key: 'photoTop', label: 'Top (0–1)', hint: 'Y start of photo area' },
+        { key: 'photoWidth', label: 'Width (0–1)', hint: 'Width of photo area' },
+        { key: 'photoHeight', label: 'Height (0–1)', hint: 'Height of photo area' },
+      ]
+    },
+    {
+      section: 'Name Text', fields: [
+        { key: 'nameCX', label: 'Center X (0–1)', hint: 'Horizontal center of name' },
+        { key: 'nameCY', label: 'Center Y (0–1)', hint: 'Vertical center of name' },
+        { key: 'nameFontPct', label: 'Font size (0–1)', hint: 'Font size as fraction of width' },
+        { key: 'maxName', label: 'Max chars', hint: 'Max combined firstName+lastName length', integer: true },
+      ]
+    },
   ];
 
   // ── Dashboard ──

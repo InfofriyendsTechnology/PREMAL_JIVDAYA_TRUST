@@ -1,6 +1,6 @@
 import { useState, useRef, useEffect } from 'react';
-import axios from 'axios';
-import { FiUploadCloud, FiDownload, FiUser } from 'react-icons/fi';
+import axios from '../axiosConfig.js';
+import { FiUploadCloud, FiDownload, FiUser, FiEye, FiEyeOff } from 'react-icons/fi';
 import Footer from '../components/Footer.jsx';
 import premalLogo from '../assets/premal_logo.jpg';
 import styles from './PosterMaker.module.css';
@@ -45,12 +45,16 @@ export default function PosterMaker() {
   const [adjZoom, setAdjZoom] = useState(1.0);               // confirmed zoom
   const [showAdjust, setShowAdjust] = useState(false);
   const [sliderVal, setSliderVal] = useState(1.0);
+  const [currentTab, setCurrentTab] = useState('create'); // 'create' or 'adjust'
   const [firstName, setFirstName] = useState('');
   const [lastName, setLastName] = useState('');
   const [phone, setPhone] = useState('');
   const [loading, setLoading] = useState(false);
   const [downloading, setDownloading] = useState(false);
   const [toast, setToast] = useState('');
+  const [showPasswordModal, setShowPasswordModal] = useState(false);
+  const [passwordInput, setPasswordInput] = useState('');
+  const [showPassword, setShowPassword] = useState(false);
 
   // ── 0. Fetch layout settings from backend ────────────────────
   useEffect(() => {
@@ -325,13 +329,25 @@ export default function PosterMaker() {
     offsetRef.current = { ...adjOffset };
     zoomRef.current = adjZoom;
     setSliderVal(adjZoom);
-    setShowAdjust(true);
+    setShowPasswordModal(true); // Show password modal first
+    setPasswordInput('');
+  };
+
+  const handlePasswordSubmit = () => {
+    if (passwordInput === 'Yash') {
+      setShowPasswordModal(false);
+      setPasswordInput('');
+      setCurrentTab('adjust'); // Switch to adjust tab
+    } else {
+      showToast('❌ Wrong password!');
+      setPasswordInput('');
+    }
   };
 
   const applyAdjust = () => {
     setAdjOffset({ ...offsetRef.current });  // confirmed → triggers poster redraw
     setAdjZoom(zoomRef.current);
-    setShowAdjust(false);
+    setCurrentTab('create'); // Back to create tab after applying
   };
 
   // ── 6. Photo file selected — direct to poster, then open adjust ─
@@ -351,7 +367,7 @@ export default function PosterMaker() {
         setAdjZoom(1.0);
         setSliderVal(1.0);
         setPhotoSrc(src);                 // → triggers useEffect → redraws poster
-        setShowAdjust(true);              // → auto-open adjust modal
+        setCurrentTab('adjust');          // → auto-switch to adjust tab
       };
       img.src = src;
     };
@@ -395,6 +411,55 @@ export default function PosterMaker() {
   // ══════════════════════════════════════════════════════════════
   return (
     <div className={styles.page}>
+
+      {/* ══ PASSWORD MODAL ═════════════════════════════════════════ */}
+      {showPasswordModal && (
+        <div className={styles.adjOverlay}>
+          <div className={styles.passwordModal}>
+            <h3 className={styles.passwordTitle}>🔐 Enter Password to Adjust</h3>
+            <p className={styles.passwordSub}>Password required to modify photo placement</p>
+
+            <div className={styles.passwordInputWrapper}>
+              <input
+                type={showPassword ? 'text' : 'password'}
+                placeholder="Enter password"
+                value={passwordInput}
+                onChange={(e) => setPasswordInput(e.target.value)}
+                onKeyPress={(e) => e.key === 'Enter' && handlePasswordSubmit()}
+                className={styles.passwordInput}
+                autoFocus
+              />
+              <button
+                className={styles.passwordToggle}
+                onClick={() => setShowPassword(!showPassword)}
+                type="button"
+                title={showPassword ? 'Hide password' : 'Show password'}
+              >
+                {showPassword ? <FiEyeOff size={18} /> : <FiEye size={18} />}
+              </button>
+            </div>
+
+            <div className={styles.passwordBtns}>
+              <button
+                className="btn btn-outline"
+                onClick={() => {
+                  setShowPasswordModal(false);
+                  setPasswordInput('');
+                  setShowPassword(false);
+                }}
+              >
+                Cancel
+              </button>
+              <button
+                className="btn btn-accent"
+                onClick={handlePasswordSubmit}
+              >
+                Unlock
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
 
       {/* ══ ADJUST PHOTO MODAL ══════════════════════════════════ */}
       {showAdjust && (
