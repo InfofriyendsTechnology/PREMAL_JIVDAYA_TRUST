@@ -1,0 +1,10 @@
+{
+    "buildCommand": "npm install",
+    "outputDirectory": ".",
+    "routes": [
+        {
+            "src": "/api/(.*)",
+            "dest": "src/server.js"
+        }
+    ]
+}

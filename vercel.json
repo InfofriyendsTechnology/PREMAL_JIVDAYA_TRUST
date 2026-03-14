@@ -1,12 +1,6 @@
 {
     "buildCommand": "cd frontend && npm install && npm run build",
     "outputDirectory": "frontend/dist",
-    "functions": {
-        "backend/src/server.js": {
-            "runtime": "nodejs18.x",
-            "memory": 1024
-        }
-    },
     "routes": [
         {
             "src": "/api/(.*)",
