@@ -1,17 +1,15 @@
 {
+    "version": 2,
     "buildCommand": "npm install",
-    "rewrites": [
+    "functions": {
+        "src/server.js": {
+            "runtime": "nodejs18.x"
+        }
+    },
+    "routes": [
         {
-            "source": "/api/(.*)",
-            "destination": "/api"
-        },
-        {
-            "source": "/health",
-            "destination": "/api"
-        },
-        {
-            "source": "/(.*)",
-            "destination": "/api"
+            "src": "/(.*)",
+            "dest": "src/server.js"
         }
     ]
 }
