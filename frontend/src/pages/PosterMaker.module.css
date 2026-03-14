@@ -1,0 +1,461 @@
+/* ─── Page ────────────────────────────────────────────────────── */
+.page {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  background: #0b0b0b;
+}
+
+/* ─── Header ──────────────────────────────────────────── */
+.header {
+  background: #111111;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+  padding: 14px 28px;
+}
+
+.headerInner {
+  max-width: 1100px;
+  margin: 0 auto;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.headerLogo {
+  height: 74px;
+  width: 74px;
+  object-fit: contain;
+  border-radius: 50%;
+  flex-shrink: 0;
+  border: 2px solid rgba(255, 255, 255, 0.1);
+}
+
+.headerText {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.headerTitle {
+  font-family: 'Khand', sans-serif;
+  font-size: clamp(1.25rem, 3.5vw, 1.9rem);
+  font-weight: 700;
+  color: #fff;
+  white-space: nowrap;
+  line-height: 1.1;
+}
+
+.headerSub {
+  font-size: clamp(0.72rem, 1.8vw, 0.88rem);
+  color: #a1a1a1;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* ─── Main layout ────────────────────────────────────────── */
+.main {
+  flex: 1;
+  display: flex;
+  flex-direction: row;
+  gap: 24px;
+  padding: 28px 24px;
+  max-width: 1100px;
+  margin: 0 auto;
+  width: 100%;
+  align-items: flex-start;
+}
+
+/* ─── Canvas section ────────────────────────────────────── */
+.canvasSection {
+  flex: 0 0 auto;
+  width: min(100%, 520px);
+}
+
+.canvasWrap {
+  position: relative;
+  width: 100%;
+  border-radius: 14px;
+  overflow: hidden;
+  box-shadow: 0 8px 40px rgba(0, 0, 0, 0.6);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  background: #1a1a1a;
+}
+
+.canvas {
+  width: 100%;
+  height: auto;
+  display: block;
+}
+
+.canvasLoader {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  background: rgba(11, 11, 11, 0.88);
+  gap: 14px;
+  font-size: 0.9rem;
+  color: #ffffff;
+  z-index: 2;
+}
+
+.spinner {
+  width: 44px;
+  height: 44px;
+  border: 4px solid rgba(255, 255, 255, 0.12);
+  border-top-color: #ffffff;
+  border-radius: 50%;
+  animation: spin 0.8s linear infinite;
+}
+
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+/* ─── Controls sidebar ────────────────────────────────────── */
+.controls {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  min-width: 0;
+}
+
+.controlCard {
+  padding: 18px;
+}
+
+.cardHeader {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  color: #ffffff;
+  font-weight: 700;
+  font-size: 1.05rem;
+  margin-bottom: 2px;
+  font-family: 'Khand', sans-serif;
+  letter-spacing: 0.3px;
+}
+
+.cardSub {
+  font-size: 0.8rem;
+  color: #888;
+  margin-bottom: 14px;
+}
+
+/* ─── Upload box ─────────────────────────────────────────── */
+.uploadBox {
+  width: 100%;
+  height: 130px;
+  border: 2px dashed rgba(255, 255, 255, 0.2);
+  border-radius: 10px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  cursor: pointer;
+  font-size: 0.85rem;
+  color: #ffffff;
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+  transition: border-color 0.2s, background 0.2s;
+  overflow: hidden;
+}
+
+.uploadBox:hover {
+  border-color: rgba(255, 255, 255, 0.5);
+  background-color: rgba(255, 255, 255, 0.04);
+}
+
+/* ── Photo action row ─── */
+.photoActions {
+  display: flex;
+  gap: 10px;
+  margin-top: 10px;
+}
+
+/* ── Adjust Photo Modal ──────────────────────────────────────── */
+.adjOverlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.85);
+  z-index: 1000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 16px;
+}
+
+.adjModal {
+  background: #161616;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 16px;
+  padding: 24px 22px 20px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 18px;
+  width: 100%;
+  max-width: 380px;
+  box-shadow: 0 24px 64px rgba(0, 0, 0, 0.75);
+}
+
+.adjHeader {
+  align-self: flex-start;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.adjTitle {
+  font-family: 'Khand', sans-serif;
+  font-size: 1.35rem;
+  font-weight: 700;
+  color: #fff;
+}
+
+.adjSub {
+  font-size: 0.78rem;
+  color: #888;
+}
+
+.adjCanvas {
+  border-radius: 8px;
+  cursor: grab;
+  touch-action: none;
+  max-width: 100%;
+  background: #0d0d0d;
+}
+
+.adjCanvas:active {
+  cursor: grabbing;
+}
+
+.adjSliderRow {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.adjLabel {
+  font-size: 0.82rem;
+  color: #aaa;
+  white-space: nowrap;
+  min-width: 36px;
+}
+
+.adjZoomBtn {
+  background: rgba(255, 255, 255, 0.07);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  color: #fff;
+  width: 30px;
+  height: 30px;
+  border-radius: 6px;
+  font-size: 1.1rem;
+  line-height: 1;
+  cursor: pointer;
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.adjZoomBtn:hover {
+  background: rgba(255, 255, 255, 0.13);
+}
+
+.adjSlider {
+  flex: 1;
+  accent-color: #f7a928;
+  cursor: pointer;
+  height: 4px;
+}
+
+.adjPct {
+  font-size: 0.80rem;
+  color: #f7a928;
+  min-width: 40px;
+  text-align: right;
+  font-variant-numeric: tabular-nums;
+}
+
+.adjBtns {
+  display: flex;
+  gap: 12px;
+  width: 100%;
+}
+
+.adjBtns .btn {
+  flex: 1;
+}
+
+.imageDimsInfo {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  width: 100%;
+  padding: 0 10px;
+  margin-top: 8px;
+}
+
+.dimensionsText {
+  font-size: 0.82rem;
+  color: #a0a0a0;
+  text-align: center;
+  font-family: 'Monaco', 'Courier New', monospace;
+  letter-spacing: 0.5px;
+}
+
+.sizeWarning {
+  font-size: 0.78rem;
+  color: #ffb74d;
+  background: rgba(255, 183, 77, 0.1);
+  border: 1px solid rgba(255, 183, 77, 0.3);
+  padding: 8px 12px;
+  border-radius: 6px;
+  line-height: 1.3;
+}
+
+.shapeFitStatus {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  font-size: 0.78rem;
+}
+
+.fitGood {
+  color: #4ade80;
+  background: rgba(74, 222, 128, 0.1);
+  border: 1px solid rgba(74, 222, 128, 0.3);
+  padding: 8px 12px;
+  border-radius: 6px;
+  line-height: 1.3;
+}
+
+.fitFair {
+  color: #facc15;
+  background: rgba(250, 204, 21, 0.1);
+  border: 1px solid rgba(250, 204, 21, 0.3);
+  padding: 8px 12px;
+  border-radius: 6px;
+  line-height: 1.3;
+}
+
+.fitSmall {
+  color: #ef4444;
+  background: rgba(239, 68, 68, 0.1);
+  border: 1px solid rgba(239, 68, 68, 0.3);
+  padding: 8px 12px;
+  border-radius: 6px;
+  line-height: 1.3;
+}
+
+/* ─── Name row ──────────────────────────────────────── */
+.nameRow {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 14px;
+}
+
+.nameCounter {
+  margin-top: 6px;
+  font-size: 0.75rem;
+  text-align: right;
+}
+
+/* ─── Download button ─────────────────────────────────────── */
+.downloadBtn {
+  width: 100%;
+  padding: 15px;
+  font-size: 1.1rem;
+  letter-spacing: 2px;
+  border-radius: 12px;
+  font-family: 'Khand', sans-serif;
+}
+
+/* ─── Toast ────────────────────────────────────────────────────── */
+.toast {
+  background: #1a1a1a;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  color: #f0f0f0;
+  padding: 12px 20px;
+  border-radius: 10px;
+  font-size: 0.88rem;
+  text-align: center;
+  animation: fadeIn 0.2s ease;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(6px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* ─── Mobile responsive ─────────────────────────────────────── */
+@media (max-width: 750px) {
+  .header {
+    padding: 12px 16px;
+  }
+
+  .headerLogo {
+    height: 52px;
+    width: 52px;
+  }
+
+  .headerTitle {
+    font-size: 1.1rem;
+    white-space: nowrap;
+  }
+
+  .headerSub {
+    display: none;
+  }
+
+  .main {
+    flex-direction: column;
+    padding: 12px;
+    gap: 12px;
+  }
+
+  /* Canvas caps at 80vw so controls are visible without scrolling */
+  .canvasSection {
+    width: 100%;
+    max-width: 80vw;
+    align-self: center;
+  }
+
+  .nameRow {
+    grid-template-columns: 1fr;
+    gap: 10px;
+  }
+
+  .controlCard {
+    padding: 14px;
+  }
+}
+
+/* Tablet: side-by-side but smaller canvas */
+@media (min-width: 751px) and (max-width: 1000px) {
+  .canvasSection {
+    width: min(100%, 400px);
+  }
+
+  .main {
+    padding: 20px 16px;
+    gap: 16px;
+  }
+}

@@ -1,0 +1,93 @@
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+:root {
+  --accent:     #f7a928;
+  --white:      #ffffff;
+  --bg-primary:   #0b0b0b;
+  --bg-secondary: #111111;
+  --bg-card:      #181818;
+  --bg-card2:     rgba(255,255,255,0.04);
+  --border:       rgba(255,255,255,0.09);
+  --text:       #f0f0f0;
+  --text-sub:   #a1a1a1;
+  --muted:      #666;
+  --radius:     12px;
+}
+
+body {
+  font-family: 'Khand', 'Poppins', sans-serif;
+  background: var(--bg-primary);
+  color: var(--text);
+  min-height: 100vh;
+}
+
+/* ── Scrollbar ── */
+::-webkit-scrollbar { width: 6px; }
+::-webkit-scrollbar-track { background: rgba(255,255,255,0.03); }
+::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.18); border-radius: 4px; }
+
+/* ── Autofill – force transparent (same as NFCwala) ── */
+input:-webkit-autofill,
+input:-webkit-autofill:hover,
+input:-webkit-autofill:focus,
+input:-webkit-autofill:active,
+textarea:-webkit-autofill,
+select:-webkit-autofill {
+  -webkit-box-shadow: 0 0 0 1000px #181818 inset !important;
+  -webkit-text-fill-color: #f0f0f0 !important;
+  caret-color: #f0f0f0 !important;
+  background-color: #181818 !important;
+  transition: background-color 5000s ease-in-out 0s;
+}
+
+/* ── Utility ── */
+.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 12px 28px;
+  border: none;
+  border-radius: var(--radius);
+  font-family: 'Poppins', sans-serif;
+  font-weight: 600;
+  font-size: 0.95rem;
+  cursor: pointer;
+  transition: transform 0.15s, box-shadow 0.15s, opacity 0.15s;
+}
+.btn:hover:not(:disabled) { transform: translateY(-2px); box-shadow: 0 6px 20px rgba(0,0,0,0.15); }
+.btn:active:not(:disabled) { transform: translateY(0); }
+.btn:disabled { opacity: 0.55; cursor: not-allowed; }
+
+.btn-primary   { background: #ffffff; color: #0b0b0b; }
+.btn-accent    { background: linear-gradient(135deg, #f7a928, #e08010); color: var(--white); }
+.btn-outline   { background: transparent; border: 2px solid rgba(255,255,255,0.3); color: #ffffff; }
+.btn-danger    { background: #e53e3e; color: var(--white); }
+.btn-green     { background: #38a169; color: var(--white); }
+
+/* ── Card ── */
+.card {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  box-shadow: 0 4px 24px rgba(0,0,0,0.4);
+  padding: 24px;
+}
+
+/* ── Input ── */
+.input-group { display: flex; flex-direction: column; gap: 6px; }
+.input-group label { font-size: 0.82rem; font-weight: 600; color: #a1a1a1; letter-spacing: 0.3px; }
+.input-group input {
+  width: 100%;
+  padding: 11px 14px;
+  border: 1.5px solid rgba(255,255,255,0.12);
+  border-radius: 8px;
+  font-family: 'Khand', 'Poppins', sans-serif;
+  font-size: 1rem;
+  outline: none;
+  background: rgba(255,255,255,0.05);
+  color: #f0f0f0;
+  transition: border-color 0.2s, background 0.2s;
+}
+.input-group input::placeholder { color: #555; }
+.input-group input:focus { border-color: rgba(255,255,255,0.4); background: rgba(255,255,255,0.07); }

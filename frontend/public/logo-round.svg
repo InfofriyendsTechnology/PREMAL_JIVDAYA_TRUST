@@ -1,0 +1,16 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" width="256" height="256">
+  <defs>
+    <mask id="circleMask">
+      <circle cx="128" cy="128" r="128" fill="white"/>
+    </mask>
+    <style>
+      .border { fill: none; stroke: #4B1A6E; stroke-width: 6; }
+    </style>
+  </defs>
+  <!-- Round background -->
+  <rect x="0" y="0" width="256" height="256" fill="#ffffff"/>
+  <!-- Logo image clipped to circle -->
+  <image x="0" y="0" width="256" height="256" href="/logo.jpg" mask="url(#circleMask)"/>
+  <!-- Border circle -->
+  <circle class="border" cx="128" cy="128" r="125"/>
+</svg>

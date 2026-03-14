@@ -1,0 +1,43 @@
+{
+    "name": "Premal Jivdaya Trust Poster Maker",
+    "short_name": "Poster Maker",
+    "description": "Create beautiful personalized posters with Premal Jivdaya Trust",
+    "start_url": "/",
+    "scope": "/",
+    "display": "standalone",
+    "orientation": "portrait-primary",
+    "theme_color": "#4B1A6E",
+    "background_color": "#ffffff",
+    "icons": [
+        {
+            "src": "/logo.jpg",
+            "sizes": "any",
+            "type": "image/jpeg",
+            "purpose": "any maskable"
+        },
+        {
+            "src": "/logo.jpg",
+            "sizes": "192x192",
+            "type": "image/jpeg",
+            "purpose": "any"
+        },
+        {
+            "src": "/logo.jpg",
+            "sizes": "512x512",
+            "type": "image/jpeg",
+            "purpose": "any"
+        }
+    ],
+    "categories": [
+        "productivity",
+        "utilities"
+    ],
+    "screenshots": [
+        {
+            "src": "/logo.jpg",
+            "sizes": "540x720",
+            "type": "image/jpeg",
+            "form_factor": "narrow"
+        }
+    ]
+}

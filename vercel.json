@@ -1,0 +1,25 @@
+{
+    "buildCommand": "cd frontend && npm install && npm run build",
+    "outputDirectory": "frontend/dist",
+    "env": {
+        "MONGODB_URI": "@mongodb_uri",
+        "ADMIN_PASSWORD": "@admin_password",
+        "FRONTEND_URL": "@frontend_url"
+    },
+    "functions": {
+        "backend/src/server.js": {
+            "runtime": "nodejs18.x",
+            "memory": 1024
+        }
+    },
+    "routes": [
+        {
+            "src": "/api/(.*)",
+            "dest": "backend/src/server.js"
+        },
+        {
+            "src": "/(.*)",
+            "dest": "frontend/dist/index.html"
+        }
+    ]
+}
