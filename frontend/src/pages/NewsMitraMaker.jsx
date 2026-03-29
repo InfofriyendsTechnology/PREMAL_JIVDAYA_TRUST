@@ -20,6 +20,8 @@ export default function NewsMitraMaker() {
   const fileInputRef = useRef(null);
   const frameRef     = useRef(null);
   const animRef      = useRef(null);
+  const recorderRef  = useRef(null);
+  const progRef      = useRef(null);
 
   const [layout, setLayout]               = useState(DEFAULT_LAYOUT);
   const [frameReady, setFrameReady]       = useState(false);
@@ -30,6 +32,7 @@ export default function NewsMitraMaker() {
   const [captionFont, setCaptionFont]     = useState('Baloo Bhai 2');
   const [captionPos, setCaptionPos]       = useState({ x: DEFAULT_LAYOUT.captionX, y: DEFAULT_LAYOUT.captionY });
   const [showCapAdjust, setShowCapAdjust] = useState(false);
+  const [playbackSpeed, setPlaybackSpeed] = useState(1);
   const [isRecording, setIsRecording]     = useState(false);
   const [recProgress, setRecProgress]     = useState(0);
   const [toast, setToast]                 = useState('');
@@ -140,13 +143,23 @@ export default function NewsMitraMaker() {
     const url = URL.createObjectURL(file);
     setVideoSrc(url);
     setVideoState({ scale: 1, panX: 0, panY: 0 }); // reset on new upload
+    setPlaybackSpeed(1); // reset speed
     const vid = videoRef.current;
     if (vid) {
-      vid.src = url; vid.loop = false; vid.muted = true;
+      // Must not be muted for captureStream to get audio, 
+      // but we will keep volume at 0 during preview if we want, or just let them hear it!
+      // Let's set muted to false so audio tracks work, but we can set volume low if needed on preview.
+      // We'll leave it playing with sound for their preview so they know it has voice.
+      vid.src = url; vid.loop = true; vid.muted = false; vid.volume = 0.5;
       vid.load();
       vid.play().catch(() => {});
     }
   };
+
+  // Keep video speed synced
+  useEffect(() => {
+    if (videoRef.current) videoRef.current.playbackRate = playbackSpeed;
+  }, [playbackSpeed, videoSrc]);
 
   // Record canvas stream and download as WebM
   const handleDownload = async () => {
@@ -161,8 +174,24 @@ export default function NewsMitraMaker() {
 
     const vid      = videoRef.current;
     const canvas   = canvasRef.current;
-    const stream   = canvas.captureStream(30);
-    const recorder = new MediaRecorder(stream, { mimeType: mime, videoBitsPerSecond: 8_000_000 });
+    
+    // Combine Video Canvas + Original Audio Track
+    const canvasStream = canvas.captureStream(30);
+    let finalStream = canvasStream;
+
+    try {
+      // Try to get audio tracks from the original video
+      const vidStream = vid.captureStream ? vid.captureStream() : vid.mozCaptureStream ? vid.mozCaptureStream() : null;
+      if (vidStream && vidStream.getAudioTracks().length > 0) {
+        finalStream = new MediaStream([ 
+          ...canvasStream.getVideoTracks(), 
+          ...vidStream.getAudioTracks() 
+        ]);
+      }
+    } catch (e) { console.warn("Could not capture audio", e); }
+
+    const recorder = new MediaRecorder(finalStream, { mimeType: mime, videoBitsPerSecond: 8_000_000 });
+    recorderRef.current = recorder;
     const chunks   = [];
 
     recorder.ondataavailable = e => { if (e.data.size > 0) chunks.push(e.data); };
@@ -173,20 +202,41 @@ export default function NewsMitraMaker() {
       a.href = url; a.download = 'newsmitra_post.webm'; a.click();
       URL.revokeObjectURL(url);
       setIsRecording(false); setRecProgress(0);
+      if (progRef.current) clearInterval(progRef.current);
       showToast('✅ Video downloaded!');
+      vid.loop = true; // restore loop
+      vid.play().catch(() => {});
     };
 
-    const dur = vid.duration || 30;
+    const dur = (vid.duration || 30) / playbackSpeed;
     const t0  = Date.now();
-    const prog = setInterval(() => {
+    progRef.current = setInterval(() => {
       setRecProgress(Math.min(99, Math.round(((Date.now() - t0) / 1000 / dur) * 100)));
     }, 300);
 
+    vid.loop = false; // ensure it stops at the end for recording
     vid.currentTime = 0;
+    vid.playbackRate = playbackSpeed;
     await vid.play();
     recorder.start();
-    vid.onended = () => { clearInterval(prog); recorder.stop(); vid.onended = null; };
-    setTimeout(() => { clearInterval(prog); if (recorder.state === 'recording') recorder.stop(); }, (dur + 3) * 1000);
+    vid.onended = () => { 
+      if (progRef.current) clearInterval(progRef.current); 
+      if (recorder.state === 'recording') recorder.stop(); 
+      vid.onended = null; 
+    };
+    // Failsafe timeout
+    setTimeout(() => { 
+      if (progRef.current) clearInterval(progRef.current); 
+      if (recorder.state === 'recording') recorder.stop(); 
+    }, (dur + 3) * 1000);
+  };
+
+  const handleStopRecording = () => {
+    if (recorderRef.current && recorderRef.current.state === 'recording') {
+      recorderRef.current.stop();
+      if (progRef.current) clearInterval(progRef.current);
+      showToast('🛑 Stopping early and saving...');
+    }
   };
 
   const showToast = (msg) => { setToast(msg); setTimeout(() => setToast(''), 4000); };
@@ -252,7 +302,7 @@ export default function NewsMitraMaker() {
             <input ref={fileInputRef} type="file" accept="video/*" style={{ display: 'none' }} onChange={handleVideo} />
 
             {videoSrc && (
-              <div className={styles.videoAdjustBox}>
+              <div className={styles.videoAdjustBox} style={{ marginTop: '0' }}>
                 <div className="input-group">
                   <label style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
                     <FiZoomIn size={14} /> Zoom: {videoState.scale.toFixed(1)}x
@@ -270,6 +320,12 @@ export default function NewsMitraMaker() {
                     <FiSliders size={14} /> Vertical Move
                   </label>
                   <input type="range" min="-1" max="1" step="0.05" value={videoState.panY} onChange={e => setVideoState(p => ({ ...p, panY: parseFloat(e.target.value) }))}/>
+                </div>
+                <div className="input-group" style={{ marginTop: '8px', borderTop: '1px solid #cbd5e1', paddingTop: '12px' }}>
+                  <label style={{ display: 'flex', alignItems: 'center', gap: '6px', color: '#213B69' }}>
+                    ⚡ Playback Speed: {playbackSpeed}x
+                  </label>
+                  <input type="range" min="0.5" max="2" step="0.25" value={playbackSpeed} onChange={e => setPlaybackSpeed(parseFloat(e.target.value))}/>
                 </div>
               </div>
             )}
@@ -367,15 +423,26 @@ export default function NewsMitraMaker() {
             </div>
           </div>
 
-          {/* Download */}
-          <button
-            className={`btn btn-accent ${styles.downloadBtn}`}
-            onClick={handleDownload}
-            disabled={!canDownload}
-          >
-            <FiDownload size={20} />
-            {isRecording ? `Recording ${recProgress}%…` : 'DOWNLOAD VIDEO'}
-          </button>
+          {/* Download / Stop Recording */}
+          {isRecording ? (
+            <button
+              className={`btn btn-danger ${styles.downloadBtn}`}
+              style={{ background: '#ef4444', borderColor: '#ef4444' }}
+              onClick={handleStopRecording}
+            >
+              <FiDownload size={20} />
+              🛑 STOP & SAVE NOW ({recProgress}%)
+            </button>
+          ) : (
+            <button
+              className={`btn btn-accent ${styles.downloadBtn}`}
+              onClick={handleDownload}
+              disabled={!canDownload}
+            >
+              <FiDownload size={20} />
+              START DOWNLOAD
+            </button>
+          )}
 
           {toast && <div className={styles.toast}>{toast}</div>}
         </aside>
