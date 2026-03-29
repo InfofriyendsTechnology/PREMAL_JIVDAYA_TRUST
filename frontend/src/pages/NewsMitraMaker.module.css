@@ -1,0 +1,136 @@
+.page { min-height: 100vh; display: flex; flex-direction: column; background: var(--bg); }
+
+/* ── Header ── */
+.header { background: linear-gradient(135deg, #0f1923 0%, #1a3a6b 100%); border-bottom: 1px solid rgba(33,59,105,0.4); padding: 14px 24px; }
+.headerInner { max-width: 1200px; margin: 0 auto; display: flex; align-items: center; gap: 14px; }
+.headerLogo { width: 52px; height: 52px; border-radius: 50%; object-fit: cover; border: 2px solid rgba(255,255,255,0.3); }
+.headerText { display: flex; flex-direction: column; }
+.headerTitle { font-size: 1.4rem; font-weight: 800; color: #fff; margin: 0; }
+.headerSub { font-size: 0.78rem; color: rgba(255,255,255,0.6); margin: 0; }
+
+/* ── Main layout ── */
+.main { flex: 1; display: flex; gap: 28px; padding: 28px 24px; max-width: 1200px; width: 100%; margin: 0 auto; }
+
+/* ── Canvas section ── */
+.canvasSection { flex: 1; display: flex; justify-content: center; }
+.canvasWrap { position: relative; width: 100%; max-width: 380px; }
+.canvas { width: 100%; height: auto; display: block; border-radius: 12px; box-shadow: 0 8px 40px rgba(0,0,0,0.5); }
+.canvasLoader {
+  position: absolute; inset: 0; display: flex; flex-direction: column;
+  align-items: center; justify-content: center; background: rgba(15,25,35,0.85);
+  border-radius: 12px; color: #fff; gap: 12px; font-size: 0.9rem;
+}
+.spinner {
+  width: 36px; height: 36px; border: 3px solid rgba(255,255,255,0.15);
+  border-top-color: #213B69; border-radius: 50%; animation: spin 0.8s linear infinite;
+}
+@keyframes spin { to { transform: rotate(360deg); } }
+
+/* ── Recording overlay ── */
+.recordingOverlay {
+  position: absolute; bottom: 16px; left: 50%; transform: translateX(-50%);
+  background: rgba(0,0,0,0.82); backdrop-filter: blur(8px);
+  border-radius: 12px; padding: 10px 18px; color: #fff;
+  display: flex; flex-direction: column; align-items: center; gap: 6px;
+  font-size: 0.82rem; font-weight: 600; min-width: 160px;
+}
+.recDot {
+  width: 10px; height: 10px; background: #ef4444; border-radius: 50%;
+  animation: blink 0.8s ease-in-out infinite; display: inline-block;
+}
+@keyframes blink { 0%,100% { opacity:1; } 50% { opacity:0.2; } }
+.recBar { width: 100%; height: 4px; background: rgba(255,255,255,0.2); border-radius: 2px; }
+.recBarFill { height: 100%; background: #213B69; border-radius: 2px; transition: width 0.3s; }
+
+/* ── Controls sidebar ── */
+.controls { width: 340px; flex-shrink: 0; display: flex; flex-direction: column; gap: 16px; }
+.controlCard { padding: 20px; }
+.cardHeader { display: flex; align-items: center; gap: 10px; font-weight: 700; font-size: 1rem; color: var(--text); margin-bottom: 6px; }
+.cardSub { font-size: 0.78rem; color: var(--text-muted); margin: 0 0 14px; }
+
+/* ── Upload box ── */
+.uploadBox {
+  background: linear-gradient(135deg, #213B69, #1a2d52);
+  border: 2px dashed rgba(255,255,255,0.25); border-radius: 12px;
+  min-height: 100px; display: flex; flex-direction: column;
+  align-items: center; justify-content: center; gap: 8px;
+  cursor: pointer; transition: all 0.2s; color: #fff; font-size: 0.85rem;
+  padding: 20px;
+}
+.uploadBox:hover { border-color: rgba(255,255,255,0.5); transform: translateY(-2px); }
+.uploadLoaded { background: linear-gradient(135deg, #1a3a2a, #213B69); border-style: solid; border-color: rgba(255,255,255,0.3); }
+.videoLoadedState { display: flex; flex-direction: column; align-items: center; gap: 6px; color: #fff; }
+.videoLoadedState span { font-weight: 700; font-size: 0.95rem; }
+.videoLoadedState small { opacity: 0.6; font-size: 0.75rem; }
+
+.videoAdjustBox {
+  margin-top: 16px;
+  padding: 16px;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+.videoAdjustBox label { font-size: 0.85rem; font-weight: 600; color: var(--text); }
+.videoAdjustBox input[type="range"] {
+  width: 100%; height: 6px; background: #cbd5e1; border-radius: 3px; outline: none; appearance: none;
+}
+.videoAdjustBox input[type="range"]::-webkit-slider-thumb {
+  appearance: none; width: 16px; height: 16px; border-radius: 50%; background: #213B69; cursor: pointer;
+}
+
+/* ── Caption textarea ── */
+.captionInput {
+  width: 100%; padding: 10px 14px; background: var(--surface);
+  border: 1.5px solid var(--border); border-radius: 10px;
+  color: var(--text); font-size: 0.95rem; font-family: inherit;
+  resize: vertical; transition: border-color 0.2s; outline: none;
+  box-sizing: border-box;
+}
+.captionInput:focus { border-color: #213B69; }
+.captionInput option {
+  background-color: #1a2d52; /* Dark background to match theme */
+  color: #ffffff; /* Explicit white text */
+}
+
+/* ── Color selector ── */
+.colorRow { display: flex; align-items: center; gap: 10px; margin-top: 14px; flex-wrap: wrap; }
+.colorLabel { font-size: 0.82rem; color: var(--text-muted); font-weight: 600; }
+.colorOptions { display: flex; align-items: center; gap: 8px; }
+.colorBtn {
+  width: 30px; height: 30px; border-radius: 50%; cursor: pointer;
+  border: 3px solid transparent; transition: transform 0.15s, border-color 0.15s;
+  outline: none; padding: 0;
+}
+.colorBtn:hover { transform: scale(1.15); }
+.colorActive { border-color: #4fc3f7 !important; transform: scale(1.2); }
+.customColorWrap { position: relative; cursor: pointer; }
+.colorPickerInput { position: absolute; inset: 0; opacity: 0; cursor: pointer; width: 100%; height: 100%; }
+.customColorPreview { width: 30px; height: 30px; border-radius: 50%; display: block; border: 3px dashed rgba(255,255,255,0.4); }
+.colorHex { font-size: 0.78rem; color: var(--text-muted); font-family: monospace; }
+
+/* ── Download button ── */
+.downloadBtn {
+  width: 100%; padding: 16px; font-size: 1.05rem; font-weight: 800;
+  display: flex; align-items: center; justify-content: center; gap: 10px;
+  border-radius: 14px; letter-spacing: 0.5px;
+}
+
+/* ── Toast ── */
+.toast {
+  background: rgba(33,59,105,0.95); backdrop-filter: blur(8px);
+  color: #fff; padding: 12px 18px; border-radius: 10px;
+  font-size: 0.88rem; font-weight: 600; text-align: center;
+  animation: fadeIn 0.3s ease;
+}
+@keyframes fadeIn { from { opacity:0; transform:translateY(8px); } to { opacity:1; transform:translateY(0); } }
+
+/* ── Responsive ── */
+@media (max-width: 768px) {
+  .main { flex-direction: column; padding: 16px; }
+  .canvasSection { width: 100%; }
+  .canvasWrap { max-width: 100%; }
+  .controls { width: 100%; }
+}

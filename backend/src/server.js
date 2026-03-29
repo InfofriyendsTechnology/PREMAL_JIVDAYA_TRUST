@@ -4,6 +4,7 @@ import dotenv from 'dotenv';
 import connectDB from './db.js';
 import posterRoutes from './routes/posterRoutes.js';
 import adminRoutes from './routes/adminRoutes.js';
+import newsMitraRoutes from './routes/newsMitraRoutes.js';
 
 dotenv.config();
 
@@ -34,6 +35,7 @@ app.get('/health', (_, res) => res.json({ status: 'ok' }));
 // API routes
 app.use('/api', posterRoutes);
 app.use('/api/admin', adminRoutes);
+app.use('/api/newsmitra', newsMitraRoutes);
 
 // Error handling middleware
 app.use((err, req, res, next) => {
