@@ -69,8 +69,10 @@ export default function NewsMitraMaker() {
     const canvas = canvasRef.current;
     const frame  = frameRef.current;
     if (!canvas || !frame) return;
-    const ctx = canvas.getContext('2d');
-    ctx.clearRect(0, 0, CANVAS_W, CANVAS_H);
+    const ctx = canvas.getContext('2d', { alpha: false }); // Disable bg alpha blending for huge performance boost
+    // fill background just in case
+    ctx.fillStyle = '#0f1923';
+    ctx.fillRect(0, 0, CANVAS_W, CANVAS_H);
 
     // 1) Video (cover-fit inside video area underneath the frame)
     const vid = videoRef.current;
@@ -127,11 +129,15 @@ export default function NewsMitraMaker() {
     }
   }, [videoSrc, caption, captionColor, captionFont, captionPos, layout, frameReady, videoState]);
 
-  // Render loop
+  // Render loop - locked to display refresh rate for buttery smooth VSync playback
   useEffect(() => {
-    const loop = () => { draw(); animRef.current = requestAnimationFrame(loop); };
-    animRef.current = requestAnimationFrame(loop);
-    return () => cancelAnimationFrame(animRef.current);
+    let animId;
+    const loop = () => {
+      draw();
+      animId = requestAnimationFrame(loop);
+    };
+    animId = requestAnimationFrame(loop);
+    return () => cancelAnimationFrame(animId);
   }, [draw]);
 
   // Handle video file upload
@@ -176,7 +182,7 @@ export default function NewsMitraMaker() {
     const canvas   = canvasRef.current;
     
     // Combine Video Canvas + Original Audio Track
-    const canvasStream = canvas.captureStream(30);
+    const canvasStream = canvas.captureStream(60); // 60 FPS for smooth 'as original' output
     let finalStream = canvasStream;
 
     try {
@@ -190,7 +196,8 @@ export default function NewsMitraMaker() {
       }
     } catch (e) { console.warn("Could not capture audio", e); }
 
-    const recorder = new MediaRecorder(finalStream, { mimeType: mime, videoBitsPerSecond: 8_000_000 });
+    // Use a much higher bitrate for maximum "as original" quality (16 Mbps)
+    const recorder = new MediaRecorder(finalStream, { mimeType: mime, videoBitsPerSecond: 16_000_000 });
     recorderRef.current = recorder;
     const chunks   = [];
 
