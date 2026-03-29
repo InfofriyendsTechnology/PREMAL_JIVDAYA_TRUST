@@ -297,7 +297,7 @@ export default function NewsMitraMaker() {
         <p className={styles.loginSub}>Private Area - Auth Required</p>
         <div className="input-group">
           <label>Access Password</label>
-          <input type="password" placeholder="Enter password (2004)" value={makerPassword}
+          <input type="password" placeholder="Enter password" value={makerPassword}
             onChange={e => setMakerPassword(e.target.value)} autoFocus style={{ textAlign: 'center' }} />
         </div>
         {makerError && <p className={styles.errorMsg}>{makerError}</p>}
