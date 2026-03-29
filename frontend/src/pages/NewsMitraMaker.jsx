@@ -23,6 +23,10 @@ export default function NewsMitraMaker() {
   const recorderRef  = useRef(null);
   const progRef      = useRef(null);
 
+  const [makerAuthed, setMakerAuthed]     = useState(false);
+  const [makerPassword, setMakerPassword] = useState('');
+  const [makerError, setMakerError]       = useState('');
+
   const [layout, setLayout]               = useState(DEFAULT_LAYOUT);
   const [frameReady, setFrameReady]       = useState(false);
   const [videoSrc, setVideoSrc]           = useState(null);
@@ -40,6 +44,8 @@ export default function NewsMitraMaker() {
 
   // Fetch layout settings
   useEffect(() => {
+    if (sessionStorage.getItem('nm_maker_pass') === '2004') setMakerAuthed(true);
+    
     axios.get('/api/newsmitra/settings')
       .then(({ data }) => {
         setLayout(prev => ({ ...prev, ...data }));
@@ -47,6 +53,16 @@ export default function NewsMitraMaker() {
       })
       .catch(() => {});
   }, []);
+
+  const handleMakerLogin = (e) => {
+    e.preventDefault();
+    if (makerPassword === '2004') {
+      sessionStorage.setItem('nm_maker_pass', '2004');
+      setMakerAuthed(true);
+    } else {
+      setMakerError('Incorrect Password');
+    }
+  };
 
   // Load frame PNG into offscreen canvas
   useEffect(() => {
@@ -248,6 +264,23 @@ export default function NewsMitraMaker() {
 
   const showToast = (msg) => { setToast(msg); setTimeout(() => setToast(''), 4000); };
   const canDownload = videoSrc && caption.trim() && frameReady && !isRecording;
+
+  if (!makerAuthed) return (
+    <div className={styles.loginPage}>
+      <form className={styles.loginCard} onSubmit={handleMakerLogin}>
+        <img src="/newsmitra_logo.png" alt="News Mitra" className={styles.loginLogo} />
+        <h2 className={styles.loginTitle}>News Mitra Editor</h2>
+        <p className={styles.loginSub}>Private Area - Auth Required</p>
+        <div className="input-group">
+          <label>Access Password</label>
+          <input type="password" placeholder="Enter password (2004)" value={makerPassword}
+            onChange={e => setMakerPassword(e.target.value)} autoFocus style={{ textAlign: 'center' }} />
+        </div>
+        {makerError && <p className={styles.errorMsg}>{makerError}</p>}
+        <button className={`btn btn-accent ${styles.loginBtn}`} type="submit">Unlock Maker</button>
+      </form>
+    </div>
+  );
 
   return (
     <div className={styles.page}>
