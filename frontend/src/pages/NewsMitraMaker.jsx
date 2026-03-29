@@ -4,8 +4,8 @@ import { FiUploadCloud, FiDownload, FiVideo, FiType, FiZoomIn, FiSliders } from 
 import Footer from '../components/Footer.jsx';
 import styles from './NewsMitraMaker.module.css';
 
-const CANVAS_W = 1080;
-const CANVAS_H = 1920;
+const BASE_W = 1080;
+const BASE_H = 1920;
 
 const DEFAULT_LAYOUT = {
   captionX: 0.500, captionY: 0.205,
@@ -64,14 +64,18 @@ export default function NewsMitraMaker() {
     }
   };
 
-  // Load frame PNG into offscreen canvas
+  const RENDER_SCALE = isRecording ? 1 : 0.40;
+  const CANVAS_W = Math.round(BASE_W * RENDER_SCALE);
+  const CANVAS_H = Math.round(BASE_H * RENDER_SCALE);
+
+  // Load frame PNG into offscreen canvas (Keep it original size)
   useEffect(() => {
     setLoading(true);
     const img = new Image();
     img.onload = () => {
       const off = document.createElement('canvas');
-      off.width = CANVAS_W; off.height = CANVAS_H;
-      off.getContext('2d').drawImage(img, 0, 0, CANVAS_W, CANVAS_H);
+      off.width = BASE_W; off.height = BASE_H;
+      off.getContext('2d').drawImage(img, 0, 0, BASE_W, BASE_H);
       frameRef.current = off;
       setFrameReady(true);
       setLoading(false);
@@ -85,8 +89,11 @@ export default function NewsMitraMaker() {
     const canvas = canvasRef.current;
     const frame  = frameRef.current;
     if (!canvas || !frame) return;
-    const ctx = canvas.getContext('2d', { alpha: false }); // Disable bg alpha blending for huge performance boost
-    // fill background just in case
+    const ctx = canvas.getContext('2d', { alpha: false }); 
+
+    // Important: Update canvas dimensions if scale changed
+    if (canvas.width !== CANVAS_W) { canvas.width = CANVAS_W; canvas.height = CANVAS_H; }
+
     ctx.fillStyle = '#0f1923';
     ctx.fillRect(0, 0, CANVAS_W, CANVAS_H);
 
@@ -148,13 +155,25 @@ export default function NewsMitraMaker() {
   // Render loop - locked to display refresh rate for buttery smooth VSync playback
   useEffect(() => {
     let animId;
-    const loop = () => {
-      draw();
+    const vid = videoRef.current;
+    
+    // We use requestVideoFrameCallback if available and video is playing to avoid duplicate frame judder
+    if (videoSrc && vid && 'requestVideoFrameCallback' in vid) {
+      const loop = () => {
+        draw();
+        animId = vid.requestVideoFrameCallback(loop);
+      };
+      animId = vid.requestVideoFrameCallback(loop);
+      return () => vid.cancelVideoFrameCallback(animId);
+    } else {
+      const loop = () => {
+        draw();
+        animId = requestAnimationFrame(loop);
+      };
       animId = requestAnimationFrame(loop);
-    };
-    animId = requestAnimationFrame(loop);
-    return () => cancelAnimationFrame(animId);
-  }, [draw]);
+      return () => cancelAnimationFrame(animId);
+    }
+  }, [draw, videoSrc]);
 
   // Handle video file upload
   const handleVideo = (e) => {
@@ -191,15 +210,18 @@ export default function NewsMitraMaker() {
       .find(t => MediaRecorder.isTypeSupported(t));
     if (!mime) { showToast('❌ Browser does not support video export'); return; }
 
-    setIsRecording(true); setRecProgress(0);
-    showToast('🎬 Recording started — please wait…');
+    setIsRecording(true); 
+    setRecProgress(0);
+    showToast('🎬 Preparing ultra high-quality download...');
 
-    const vid      = videoRef.current;
-    const canvas   = canvasRef.current;
-    
-    // Combine Video Canvas + Original Audio Track
-    const canvasStream = canvas.captureStream(60); // 60 FPS for smooth 'as original' output
-    let finalStream = canvasStream;
+    // Wait for React to apply `isRecording=true` which updates CANVAS_W and canvas.width!
+    setTimeout(async () => {
+      const vid      = videoRef.current;
+      const canvas   = canvasRef.current;
+      
+      // Combine Video Canvas + Original Audio Track
+      const canvasStream = canvas.captureStream(60); // 60 FPS for smooth 'as original' output
+      let finalStream = canvasStream;
 
     try {
       // Try to get audio tracks from the original video
@@ -247,11 +269,13 @@ export default function NewsMitraMaker() {
       if (recorder.state === 'recording') recorder.stop(); 
       vid.onended = null; 
     };
-    // Failsafe timeout
-    setTimeout(() => { 
-      if (progRef.current) clearInterval(progRef.current); 
-      if (recorder.state === 'recording') recorder.stop(); 
-    }, (dur + 3) * 1000);
+      // Failsafe timeout
+      setTimeout(() => { 
+        if (progRef.current) clearInterval(progRef.current); 
+        if (recorderRef.current && recorderRef.current.state === 'recording') recorderRef.current.stop(); 
+      }, (dur + 3) * 1000);
+      
+    }, 200); // 200ms delay gives canvas enough time to stretch to 1080x1920 physically
   };
 
   const handleStopRecording = () => {
