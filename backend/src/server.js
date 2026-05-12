@@ -48,11 +48,13 @@ connectDB().catch(err => {
   console.warn('⚠️ Database warning:', err.message);
 });
 
-// For local development
-app.listen(PORT, () => {
-  console.log(`✅ Server running on http://localhost:${PORT}`);
-  console.log(`✅ CORS enabled for:`, corsOptions.origin);
-});
+// For local development only (Vercel uses the exported app directly)
+if (!process.env.VERCEL) {
+  app.listen(PORT, () => {
+    console.log(`✅ Server running on http://localhost:${PORT}`);
+    console.log(`✅ CORS enabled for:`, corsOptions.origin);
+  });
+}
 
 // Export for Vercel serverless
 export default app;
