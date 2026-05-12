@@ -26,6 +26,15 @@ const settingsSchema = new mongoose.Schema(
     logoX:   { type: Number, default: 0.782 },
     logoY:   { type: Number, default: 0.157 },
     logoSize:{ type: Number, default: 0.120 },
+
+    // ── Nand Utsav layout ──────────────────────────────────────
+    nuFrameCX:     { type: Number, default: 0.705 },
+    nuFrameCY:     { type: Number, default: 0.645 },
+    nuFrameR:      { type: Number, default: 0.155 },
+    nuNameCX:      { type: Number, default: 0.30 },
+    nuNameCY:      { type: Number, default: 0.775 },
+    nuNameFontPct: { type: Number, default: 0.025 },
+    nuMaxName:     { type: Number, default: 18 },
   },
   { timestamps: true }
 );

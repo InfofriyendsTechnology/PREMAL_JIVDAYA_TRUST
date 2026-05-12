@@ -8,6 +8,7 @@ const router = express.Router();
 // Simple password guard middleware
 const adminAuth = (req, res, next) => {
   const pass = req.headers['x-admin-password'] || req.query.password;
+  console.log('🔑 Auth check:', { received: pass, expected: process.env.ADMIN_PASSWORD, match: pass === process.env.ADMIN_PASSWORD });
   if (!pass || pass !== process.env.ADMIN_PASSWORD) {
     return res.status(401).json({ error: 'Unauthorized' });
   }
@@ -34,11 +35,11 @@ router.get('/export', adminAuth, async (req, res) => {
     const sheet = workbook.addWorksheet('Poster Downloads');
 
     sheet.columns = [
-      { header: 'Sr.No',      key: 'sr',        width: 8  },
-      { header: 'First Name', key: 'firstName',  width: 22 },
-      { header: 'Last Name',  key: 'lastName',   width: 22 },
-      { header: 'Phone',      key: 'phone',      width: 18 },
-      { header: 'Date & Time',key: 'createdAt',  width: 26 },
+      { header: 'Sr.No', key: 'sr', width: 8 },
+      { header: 'First Name', key: 'firstName', width: 22 },
+      { header: 'Last Name', key: 'lastName', width: 22 },
+      { header: 'Phone', key: 'phone', width: 18 },
+      { header: 'Date & Time', key: 'createdAt', width: 26 },
     ];
 
     // Style header
@@ -53,10 +54,10 @@ router.get('/export', adminAuth, async (req, res) => {
     // Data rows
     submissions.forEach((s, i) => {
       const row = sheet.addRow({
-        sr:        i + 1,
+        sr: i + 1,
         firstName: s.firstName,
-        lastName:  s.lastName,
-        phone:     s.phone,
+        lastName: s.lastName,
+        phone: s.phone,
         createdAt: new Date(s.createdAt).toLocaleString('en-IN', { timeZone: 'Asia/Kolkata' }),
       });
       row.eachCell((cell) => {
@@ -111,14 +112,14 @@ router.get('/settings', async (req, res) => {
   try {
     const s = await Settings.findOne({ key: 'poster_layout' });
     res.json(s ? {
-      photoLeft:   s.photoLeft,
-      photoTop:    s.photoTop,
-      photoWidth:  s.photoWidth,
+      photoLeft: s.photoLeft,
+      photoTop: s.photoTop,
+      photoWidth: s.photoWidth,
       photoHeight: s.photoHeight,
-      nameCX:      s.nameCX,
-      nameCY:      s.nameCY,
+      nameCX: s.nameCX,
+      nameCY: s.nameCY,
       nameFontPct: s.nameFontPct,
-      maxName:     s.maxName,
+      maxName: s.maxName,
     } : DEFAULT_LAYOUT);
   } catch (err) {
     res.status(500).json({ error: 'Server error' });
@@ -135,14 +136,61 @@ router.put('/settings', adminAuth, async (req, res) => {
       { upsert: true, new: true, setDefaultsOnInsert: true }
     );
     res.json({
-      photoLeft:   s.photoLeft,
-      photoTop:    s.photoTop,
-      photoWidth:  s.photoWidth,
+      photoLeft: s.photoLeft,
+      photoTop: s.photoTop,
+      photoWidth: s.photoWidth,
       photoHeight: s.photoHeight,
-      nameCX:      s.nameCX,
-      nameCY:      s.nameCY,
+      nameCX: s.nameCX,
+      nameCY: s.nameCY,
       nameFontPct: s.nameFontPct,
-      maxName:     s.maxName,
+      maxName: s.maxName,
+    });
+  } catch (err) {
+    res.status(500).json({ error: 'Server error' });
+  }
+});
+
+// ── Nand Utsav Layout Settings ───────────────────────────────────
+const DEFAULT_NU_LAYOUT = {
+  nuFrameCX: 0.705, nuFrameCY: 0.645, nuFrameR: 0.155,
+  nuNameCX: 0.30, nuNameCY: 0.775, nuNameFontPct: 0.025, nuMaxName: 18,
+};
+
+// GET /api/admin/nand-utsav-settings — public
+router.get('/nand-utsav-settings', async (req, res) => {
+  try {
+    const s = await Settings.findOne({ key: 'poster_layout' });
+    res.json(s ? {
+      nuFrameCX: s.nuFrameCX,
+      nuFrameCY: s.nuFrameCY,
+      nuFrameR: s.nuFrameR,
+      nuNameCX: s.nuNameCX,
+      nuNameCY: s.nuNameCY,
+      nuNameFontPct: s.nuNameFontPct,
+      nuMaxName: s.nuMaxName,
+    } : DEFAULT_NU_LAYOUT);
+  } catch (err) {
+    res.status(500).json({ error: 'Server error' });
+  }
+});
+
+// PUT /api/admin/nand-utsav-settings — admin auth required
+router.put('/nand-utsav-settings', adminAuth, async (req, res) => {
+  try {
+    const { nuFrameCX, nuFrameCY, nuFrameR, nuNameCX, nuNameCY, nuNameFontPct, nuMaxName } = req.body;
+    const s = await Settings.findOneAndUpdate(
+      { key: 'poster_layout' },
+      { nuFrameCX, nuFrameCY, nuFrameR, nuNameCX, nuNameCY, nuNameFontPct, nuMaxName },
+      { upsert: true, new: true, setDefaultsOnInsert: true }
+    );
+    res.json({
+      nuFrameCX: s.nuFrameCX,
+      nuFrameCY: s.nuFrameCY,
+      nuFrameR: s.nuFrameR,
+      nuNameCX: s.nuNameCX,
+      nuNameCY: s.nuNameCY,
+      nuNameFontPct: s.nuNameFontPct,
+      nuMaxName: s.nuMaxName,
     });
   } catch (err) {
     res.status(500).json({ error: 'Server error' });

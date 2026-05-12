@@ -4,6 +4,8 @@ import AdminPanel from './pages/AdminPanel.jsx';
 import LayoutSettings from './pages/LayoutSettings.jsx';
 import NewsMitraMaker from './pages/NewsMitraMaker.jsx';
 import NewsMitraAdmin from './pages/NewsMitraAdmin.jsx';
+import NandUtsavMaker from './pages/NandUtsavMaker.jsx';
+import NandUtsavLayout from './pages/NandUtsavLayout.jsx';
 
 export default function App() {
   return (
@@ -14,6 +16,8 @@ export default function App() {
         <Route path="/layout" element={<LayoutSettings />} />
         <Route path="/newsmitra" element={<NewsMitraMaker />} />
         <Route path="/newsmitra/admin" element={<NewsMitraAdmin />} />
+        <Route path="/nand-utsav" element={<NandUtsavMaker />} />
+        <Route path="/nand-utsav/layout" element={<NandUtsavLayout />} />
       </Routes>
     </BrowserRouter>
   );
