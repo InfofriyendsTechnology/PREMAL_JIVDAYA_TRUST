@@ -197,4 +197,51 @@ router.put('/nand-utsav-settings', adminAuth, async (req, res) => {
   }
 });
 
+// ── Rukmani Vivah Layout Settings ──────────────────────────────────
+const DEFAULT_RV_LAYOUT = {
+  rvFrameCX: 0.22, rvFrameCY: 0.69, rvFrameR: 0.17,
+  rvNameCX: 0.70, rvNameCY: 0.84, rvNameFontPct: 0.025, rvMaxName: 18,
+};
+
+// GET /api/admin/rukmani-vivah-settings — public
+router.get('/rukmani-vivah-settings', async (req, res) => {
+  try {
+    const s = await Settings.findOne({ key: 'poster_layout' });
+    res.json(s ? {
+      rvFrameCX:     s.rvFrameCX,
+      rvFrameCY:     s.rvFrameCY,
+      rvFrameR:      s.rvFrameR,
+      rvNameCX:      s.rvNameCX,
+      rvNameCY:      s.rvNameCY,
+      rvNameFontPct: s.rvNameFontPct,
+      rvMaxName:     s.rvMaxName,
+    } : DEFAULT_RV_LAYOUT);
+  } catch (err) {
+    res.status(500).json({ error: 'Server error' });
+  }
+});
+
+// PUT /api/admin/rukmani-vivah-settings — admin auth required
+router.put('/rukmani-vivah-settings', adminAuth, async (req, res) => {
+  try {
+    const { rvFrameCX, rvFrameCY, rvFrameR, rvNameCX, rvNameCY, rvNameFontPct, rvMaxName } = req.body;
+    const s = await Settings.findOneAndUpdate(
+      { key: 'poster_layout' },
+      { rvFrameCX, rvFrameCY, rvFrameR, rvNameCX, rvNameCY, rvNameFontPct, rvMaxName },
+      { upsert: true, new: true, setDefaultsOnInsert: true }
+    );
+    res.json({
+      rvFrameCX:     s.rvFrameCX,
+      rvFrameCY:     s.rvFrameCY,
+      rvFrameR:      s.rvFrameR,
+      rvNameCX:      s.rvNameCX,
+      rvNameCY:      s.rvNameCY,
+      rvNameFontPct: s.rvNameFontPct,
+      rvMaxName:     s.rvMaxName,
+    });
+  } catch (err) {
+    res.status(500).json({ error: 'Server error' });
+  }
+});
+
 export default router;

@@ -35,6 +35,15 @@ const settingsSchema = new mongoose.Schema(
     nuNameCY:      { type: Number, default: 0.775 },
     nuNameFontPct: { type: Number, default: 0.025 },
     nuMaxName:     { type: Number, default: 18 },
+
+    // ── Rukmani Vivah layout ───────────────────────────────────
+    rvFrameCX:     { type: Number, default: 0.22 },
+    rvFrameCY:     { type: Number, default: 0.69 },
+    rvFrameR:      { type: Number, default: 0.17 },
+    rvNameCX:      { type: Number, default: 0.70 },
+    rvNameCY:      { type: Number, default: 0.84 },
+    rvNameFontPct: { type: Number, default: 0.025 },
+    rvMaxName:     { type: Number, default: 18 },
   },
   { timestamps: true }
 );

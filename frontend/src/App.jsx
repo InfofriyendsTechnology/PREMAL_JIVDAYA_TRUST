@@ -6,6 +6,8 @@ import NewsMitraMaker from './pages/NewsMitraMaker.jsx';
 import NewsMitraAdmin from './pages/NewsMitraAdmin.jsx';
 import NandUtsavMaker from './pages/NandUtsavMaker.jsx';
 import NandUtsavLayout from './pages/NandUtsavLayout.jsx';
+import RukmaniVivahMaker from './pages/RukmaniVivahMaker.jsx';
+import RukmaniVivahLayout from './pages/RukmaniVivahLayout.jsx';
 
 export default function App() {
   return (
@@ -18,6 +20,8 @@ export default function App() {
         <Route path="/newsmitra/admin" element={<NewsMitraAdmin />} />
         <Route path="/nand-utsav" element={<NandUtsavMaker />} />
         <Route path="/nand-utsav/layout" element={<NandUtsavLayout />} />
+        <Route path="/rukmani-vivah" element={<RukmaniVivahMaker />} />
+        <Route path="/rukmani-vivah/layout" element={<RukmaniVivahLayout />} />
       </Routes>
     </BrowserRouter>
   );
